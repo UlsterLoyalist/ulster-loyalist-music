@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Music of the Land — Ulster Loyalist Music</title>
+  <link rel="stylesheet" href="album.css" />
+</head>
+<body>
+
+  <header>
+    <h1>Music of the Land</h1>
+    <a href="index.html" class="back-link">← Back to Archive</a>
+  </header>
+
+  <section class="album-info">
+    <img src="music/songs-of-the-land/Front.jpg" alt="Songs of the Land Cover" />
+    
+    <div class="album-details">
+        <p><strong>Album name:</strong> Music of the Land</p>
+        <p><strong>Date Published:</strong> 2025</p>
+        <p><strong>Archive.org Link:</strong> <a href="https://archive.org/details/music-of-the-land" target="_blank" rel="noopener noreferrer">Archive.org</a></p>
+        <p><strong>Telegram Link:</strong> <a href="https://t.me/UlsterArchive/1468" target="_blank" rel="noopener noreferrer">Telegram Channel</a></p>
+        <p><strong>Mega.nz Link:</strong> <a href="https://mega.nz/folder/ido21YoD#qwdIDnc9uVW_x5M2DPBiMQ" target="_blank" rel="noopener noreferrer">Mega.nz Folder</a></p>            
+    </div>
+  </section>
+
+  <section class="player-section">
+    <ul id="tracklist"></ul>
+  </section>
+
+  <script>
+    const album = {
+      folder: "music/songs-of-the-land/",
+      tracks: [
+        "We'll Fight In The Bogside.mp3",
+        "We'll fight in the bogside (1976 original).mp3",
+        "Up the UDA.mp3",
+        "UFF (Alternative).mp3",
+        "UDA All The Way.mp3",
+        "U.Y.M.mp3",
+        "U.F.F.mp3",
+        "South East Antrim Brigade.mp3",
+        "Quis Separabit.mp3",
+        "Orange Wings.mp3",
+        "Michael 3, Milltown 0.mp3",
+        "Men of the UFF.mp3",
+        "Men of the UDA.mp3",
+        "Men of the U.D.F.mp3",
+        "Join the UDA.mp3",
+        "In Memory of Sgt. Lindsay Morrow.mp3",
+        "Ill Always Be A Womble.mp3",
+        "Gibraltar (Michael Stone).mp3",
+        "Garvaghy Road.mp3",
+        "Freedom Fighters.mp3",
+        "CYC.mp3",
+        "Big John.mp3"
+      ]
+    };
+  
+    const tracklist = document.getElementById('tracklist');
+    let currentIndex = -1;
+    let currentAudio = null;
+    let currentPlayBtn = null;
+    let currentSeekBar = null;
+    let currentTimeDisplay = null;
+  
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+  
+    function createTrackItem(track, index) {
+      const li = document.createElement('li');
+      li.className = 'track-item';
+  
+      const trackInfo = document.createElement('div');
+      trackInfo.className = 'track-info';
+  
+      const nameSpan = document.createElement('span');
+      nameSpan.textContent = track;
+      trackInfo.appendChild(nameSpan);
+  
+      li.appendChild(trackInfo);
+  
+      const controls = document.createElement('div');
+      controls.className = 'player-controls';
+  
+      const prevBtn = document.createElement('button');
+      prevBtn.className = 'play-pause';
+      prevBtn.innerHTML = '&#9664;';
+      prevBtn.title = 'Previous';
+      controls.appendChild(prevBtn);
+  
+      const playPauseBtn = document.createElement('button');
+      playPauseBtn.className = 'play-pause';
+      playPauseBtn.innerHTML = '&#9658;';
+      playPauseBtn.setAttribute('aria-label', 'Play');
+      controls.appendChild(playPauseBtn);
+  
+      const nextBtn = document.createElement('button');
+      nextBtn.className = 'play-pause';
+      nextBtn.innerHTML = '&#9654;';
+      nextBtn.title = 'Next';
+      controls.appendChild(nextBtn);
+  
+      const seekBar = document.createElement('input');
+      seekBar.type = 'range';
+      seekBar.className = 'seek-bar';
+      seekBar.min = 0;
+      seekBar.value = 0;
+      controls.appendChild(seekBar);
+  
+      const timeDisplay = document.createElement('div');
+      timeDisplay.className = 'time-display';
+      timeDisplay.textContent = '0:00 / 0:00';
+      controls.appendChild(timeDisplay);
+  
+      li.appendChild(controls);
+  
+      const audio = document.createElement('audio');
+      audio.src = album.folder + encodeURIComponent(track);
+      li.appendChild(audio);
+  
+      playPauseBtn.addEventListener('click', () => {
+        if (currentAudio && currentAudio !== audio) {
+          currentAudio.pause();
+          if (currentPlayBtn) currentPlayBtn.innerHTML = '&#9658;';
+          if (currentPlayBtn) currentPlayBtn.setAttribute('aria-label', 'Play');
+          if (currentSeekBar) currentSeekBar.value = 0;
+          if (currentTimeDisplay) currentTimeDisplay.textContent = '0:00 / 0:00';
+          if (currentAudio.parentElement) currentAudio.parentElement.classList.remove('playing');
+        }
+  
+        if (audio.paused) {
+          audio.play();
+          playPauseBtn.innerHTML = '&#10074;&#10074;';
+          playPauseBtn.setAttribute('aria-label', 'Pause');
+          li.classList.add('playing');
+          currentAudio = audio;
+          currentPlayBtn = playPauseBtn;
+          currentSeekBar = seekBar;
+          currentTimeDisplay = timeDisplay;
+          currentIndex = index;
+        } else {
+          audio.pause();
+          playPauseBtn.innerHTML = '&#9658;';
+          playPauseBtn.setAttribute('aria-label', 'Play');
+          li.classList.remove('playing');
+        }
+      });
+  
+      audio.addEventListener('timeupdate', () => {
+        seekBar.max = audio.duration;
+        seekBar.value = audio.currentTime;
+        timeDisplay.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+      });
+  
+      seekBar.addEventListener('input', () => {
+        audio.currentTime = seekBar.value;
+      });
+  
+      audio.addEventListener('ended', () => {
+        playPauseBtn.innerHTML = '&#9658;';
+        seekBar.value = 0;
+        timeDisplay.textContent = '0:00 / 0:00';
+        li.classList.remove('playing');
+      });
+  
+      prevBtn.addEventListener('click', () => {
+        if (index > 0) {
+          document.querySelectorAll('audio')[index - 1].parentElement.querySelector('.play-pause:nth-child(2)').click();
+        }
+      });
+  
+      nextBtn.addEventListener('click', () => {
+        if (index < album.tracks.length - 1) {
+          document.querySelectorAll('audio')[index + 1].parentElement.querySelector('.play-pause:nth-child(2)').click();
+        }
+      });
+  
+      return li;
+    }
+  
+    album.tracks.forEach((track, index) => {
+      const trackElement = createTrackItem(track, index);
+      tracklist.appendChild(trackElement);
+    });
+  </script>
+
+</body>
+</html>

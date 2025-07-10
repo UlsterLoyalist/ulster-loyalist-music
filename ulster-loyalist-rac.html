@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ulster Loyalist RAC — Ulster Loyalist Music</title>
+  <link rel="stylesheet" href="album.css" />
+</head>
+<body>
+
+  <header>
+    <h1>Ulster Loyalist RAC</h1>
+    <a href="index.html" class="back-link">← Back to Archive</a>
+  </header>
+
+  <section class="album-info">
+    <img src="./music/rac/Front - HD.png" alt="Billy Wright Album Cover" />
+    
+    <div class="album-details">
+      <p><strong>Album name: Ulster Loyalist RAC</strong></p>
+      <div class="album-details">
+        <p><strong>Date Published:</strong> 2025</p>
+        <p><strong>Archive.org Link:</strong> <a href="https://archive.org/details/Ulster-Loyalist-RAC" target="_blank" rel="noopener noreferrer">Archive.org</a></p>
+        <p><strong>Telegram Link:</strong> <a href="https://t.me/UlsterArchive/1630" target="_blank" rel="noopener noreferrer">Telegram Channel</a></p>
+        <p><strong>Mega.nz Link:</strong> <a href="https://mega.nz/folder/PI4hWBxL#MdU2FYqsGTRgyv75Wkbm3Q" target="_blank" rel="noopener noreferrer">Mega.nz Folder</a></p>            
+      </div>
+    </div>
+  </section>
+
+  <section class="player-section">
+    <ul id="tracklist"></ul>
+  </section>
+
+  <script>
+const album = {
+  folder: "music/rac/",
+  tracks: [
+    "1. No Surrender - Razors Edge.mp3",
+    "2. Ulster Freedom Fighters - Razors Edge.mp3",
+    "3. Free Loyalist Prisoners - Razors Edge.mp3",
+    "4. Smash the IRA - Skrewdriver.mp3",
+    "5. Ulster Heories - TNF.mp3",
+    "6. Billy Wright - TNF.mp3",
+    "7. Ulster - English Rose.mp3",
+    "8. UDA Arise Intimidation One.mp3",
+    "9. Ulster - Sudden Impact.mp3",
+    "10. Ole, Ole! - Celtic Warrior.mp3",
+    "11. Ulsters Torch - Celtic Warrior.mp3",
+    "12. Who Dares Wins - Open Season.mp3",
+    "13. Brave Ulster - Broadsword.mp3",
+    "14. No Surrender to the IRA - Avalon.mp3",
+    "15. IRA Bastards - Public Enemy.mp3",
+    "16. Hang the marxist IRA! - Public Enemy.mp3",
+    "17. No Surrender - Squadron.mp3",
+    "18. Hang The I.R.A. - Skullhead.mp3",
+    "19. Brave Ulster - Warlord.mp3",
+    "20. Soldier F - Tank Turret.mp3",
+    "21. Ulster, A Land to Die For - The Red Hand Band.mp3",
+    "22. No Surrender - The Red Hand Band.mp3",
+    "23. The Voice of Ulster - The Red Hand Band.mp3",
+    "24. Fight for Ulster - The Red Hand Band.mp3",
+    "25. It's Time to Finish - The Red Hand Band.mp3",
+    "26. Go Home Gerry - The Red Hand Band.mp3",
+    "27. Drumcree - The Red Hand Band.mp3",
+    "28. Hail the Red Hand - The Red Hand Band.mp3",
+    "29. Hang the IRA - Warhammer.mp3",
+    "30. IRA & the ANC - Nordic Thunder.mp3",
+    "31. Loyal Ulster - Section 88.mp3",
+    "32. Loyalist - The Order.mp3"
+  ]
+};
+
+const tracklist = document.getElementById('tracklist');
+    let currentIndex = -1;
+    let currentAudio = null;
+    let currentPlayBtn = null;
+    let currentSeekBar = null;
+    let currentTimeDisplay = null;
+
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    function createTrackItem(track, index) {
+      const li = document.createElement('li');
+      li.className = 'track-item';
+
+      const trackInfo = document.createElement('div');
+      trackInfo.className = 'track-info';
+      trackInfo.textContent = track;
+      li.appendChild(trackInfo);
+
+      const controls = document.createElement('div');
+      controls.className = 'player-controls';
+
+      const prevBtn = document.createElement('button');
+      prevBtn.className = 'play-pause';
+      prevBtn.innerHTML = '&#9664;';
+      prevBtn.title = 'Previous';
+      controls.appendChild(prevBtn);
+
+      const playPauseBtn = document.createElement('button');
+      playPauseBtn.className = 'play-pause';
+      playPauseBtn.innerHTML = '&#9658;';
+      playPauseBtn.setAttribute('aria-label', 'Play');
+      controls.appendChild(playPauseBtn);
+
+      const nextBtn = document.createElement('button');
+      nextBtn.className = 'play-pause';
+      nextBtn.innerHTML = '&#9654;';
+      nextBtn.title = 'Next';
+      controls.appendChild(nextBtn);
+
+      const seekBar = document.createElement('input');
+      seekBar.type = 'range';
+      seekBar.className = 'seek-bar';
+      seekBar.min = 0;
+      seekBar.value = 0;
+      controls.appendChild(seekBar);
+
+      const timeDisplay = document.createElement('div');
+      timeDisplay.className = 'time-display';
+      timeDisplay.textContent = '0:00 / 0:00';
+      controls.appendChild(timeDisplay);
+
+      li.appendChild(controls);
+
+      const audio = document.createElement('audio');
+      audio.src = album.folder + encodeURIComponent(track);
+      li.appendChild(audio);
+
+      // Play/Pause toggle
+      playPauseBtn.addEventListener('click', () => {
+        if (currentAudio && currentAudio !== audio) {
+          currentAudio.pause();
+          if (currentPlayBtn) currentPlayBtn.innerHTML = '&#9658;';
+          if (currentPlayBtn) currentPlayBtn.setAttribute('aria-label', 'Play');
+          if (currentSeekBar) currentSeekBar.value = 0;
+          if (currentTimeDisplay) currentTimeDisplay.textContent = '0:00 / 0:00';
+          if (currentAudio.parentElement) currentAudio.parentElement.classList.remove('playing');
+        }
+
+        if (audio.paused) {
+          audio.play();
+          playPauseBtn.innerHTML = '&#10074;&#10074;';
+          playPauseBtn.setAttribute('aria-label', 'Pause');
+          li.classList.add('playing');
+          currentAudio = audio;
+          currentPlayBtn = playPauseBtn;
+          currentSeekBar = seekBar;
+          currentTimeDisplay = timeDisplay;
+          currentIndex = index;
+        } else {
+          audio.pause();
+          playPauseBtn.innerHTML = '&#9658;';
+          playPauseBtn.setAttribute('aria-label', 'Play');
+          li.classList.remove('playing');
+        }
+      });
+
+      // Seekbar update
+      audio.addEventListener('timeupdate', () => {
+        seekBar.max = audio.duration;
+        seekBar.value = audio.currentTime;
+        timeDisplay.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+      });
+
+      // Seek interaction
+      seekBar.addEventListener('input', () => {
+        audio.currentTime = seekBar.value;
+      });
+
+      // Track ended
+      audio.addEventListener('ended', () => {
+        playPauseBtn.innerHTML = '&#9658;';
+        seekBar.value = 0;
+        timeDisplay.textContent = '0:00 / 0:00';
+        li.classList.remove('playing');
+      });
+
+      // Previous
+      prevBtn.addEventListener('click', () => {
+        if (index > 0) {
+          document.querySelectorAll('audio')[index - 1].parentElement.querySelector('.play-pause:nth-child(2)').click();
+        }
+      });
+
+      // Next
+      nextBtn.addEventListener('click', () => {
+        if (index < album.tracks.length - 1) {
+          document.querySelectorAll('audio')[index + 1].parentElement.querySelector('.play-pause:nth-child(2)').click();
+        }
+      });
+
+      return li;
+    }
+
+    album.tracks.forEach((track, index) => {
+      const trackElement = createTrackItem(track, index);
+      tracklist.appendChild(trackElement);
+    });
+  </script>
+
+</body>
+</html>
